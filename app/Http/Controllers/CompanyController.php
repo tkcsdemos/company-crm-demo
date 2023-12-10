@@ -43,7 +43,7 @@ class CompanyController extends Controller
 
         $data = $request->validated();
 
-        $data['logo'] = $this->setFile($request->input('logo'));
+        $data['logo'] = $this->setFile($request->file('logo'));
 
         Company::create($data);
 
@@ -84,7 +84,7 @@ class CompanyController extends Controller
 
         $data = $request->validated();
         $old_logo = $request->get('old_logo', '');
-        $name = $this->setFile($request->input('logo'), $old_logo);
+        $name = $this->setFile($request->file('logo'), $old_logo);
 
         if (empty($name) && !empty($company->logo) ) {
             $this->removeLogo($company->logo);
@@ -128,10 +128,11 @@ class CompanyController extends Controller
     private function setFile($file, string $old_logo = ''): string 
     {
         $name = $old_logo;
+        
         if ($file) {
             $this->removeLogo($old_logo);
             $name = now()->timestamp."_{$file->getClientOriginalName()}";
-            $file->storeAs('logos', $name, 'public');
+            $result = $file->storeAs('logos', $name, 'public');
         }
 
         return $name;
